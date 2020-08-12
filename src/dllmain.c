@@ -92,12 +92,13 @@ void InsertData(RainObject* o, double* v, PORT_ULONGLONG time, PORT_ULONGLONG co
 		di = o->full ? (o->end + 1) % MAX_DATA_LENGTH : 0;//data begin index;
 
 	if (!o->time)
-		o->time = time - 1;
+		o->time = time;
 
 	if (time > o->time + MAX_DATA_LENGTH) {
 		CopyData(o, 0, v, count);
 		o->time = time + count;
 		o->end = count - 1;
+		o->full = 0;
 	}
 	else if (time > o->time) {
 		InsertFuture(o, v, time, count);

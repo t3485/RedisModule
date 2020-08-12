@@ -87,6 +87,7 @@ void InsertData(RainObject* o, double* v, long long time, long long count) {
 		CopyData(o, 0, v, count);
 		o->time = time + count;
 		o->end = count - 1;
+		o->full = 0;
 	}
 	else if (time > o->time) {
 		InsertFuture(o, v, time, count);
