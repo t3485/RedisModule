@@ -397,6 +397,25 @@ void RainTypeAofRewrite(RedisModuleIO* aof, RedisModuleString* key, void* value)
 	}
 }
 
+int RainTypeNow_RedisCommand(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
+	RedisModule_AutoMemory(ctx); /* Use automatic memory management. */
+
+	if (argc != 2) return RedisModule_WrongArity(ctx);
+	RedisModuleKey* key = RedisModule_OpenKey(ctx, argv[1], REDISMODULE_READ | REDISMODULE_WRITE);
+	int type = RedisModule_KeyType(key);
+	if (type != REDISMODULE_KEYTYPE_EMPTY && RedisModule_ModuleTypeGetType(key) != RainType) {
+		return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
+	}
+
+	RainObject* hto = RedisModule_ModuleTypeGetValue(key);
+	if (hto != NULL)
+		RedisModule_ReplyWithLongLong(ctx, hto->time);
+	else
+		RedisModule_ReplyWithNull(ctx);
+
+	return REDISMODULE_OK;
+}
+
 char* getfmt() {
 	char* m = (char*)malloc(sizeof(int) * 2 + sizeof(char*)); /* prepare enough memory*/
 	void* bm = m; /* copies the pointer */
@@ -455,6 +474,10 @@ __declspec(dllexport) int RedisModule_OnLoad(RedisModuleCtx* ctx, RedisModuleStr
 
 	if (RedisModule_CreateCommand(ctx, "raintype.sum",
 		RainTypeSum_RedisCommand, "readonly", 1, 1, 1) == REDISMODULE_ERR)
+		return REDISMODULE_ERR;
+
+	if (RedisModule_CreateCommand(ctx, "raintype.now",
+		RainTypeNow_RedisCommand, "readonly", 1, 1, 1) == REDISMODULE_ERR)
 		return REDISMODULE_ERR;
 
 	return REDISMODULE_OK;
