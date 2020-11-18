@@ -435,7 +435,7 @@ void time2str(long long n, char* buf, size_t len)
 			return;
 		}
 	}
-	gmtime_s(&p, &time);
+	gmtime_s(&p, &n);
 	strftime(buf, len, "%Y-%m-%d %H:%M:%S", &p);
 }
 
@@ -458,7 +458,7 @@ int RainTypeTime_RedisCommand(RedisModuleCtx* ctx, RedisModuleString** argv, int
 		time2str(begin, buf, 26);
 		RedisModule_ReplyWithArray(ctx, REDISMODULE_POSTPONED_ARRAY_LEN);
 		RedisModule_ReplyWithCString(ctx, buf);
-		time2str(begin, buf, 26);
+		time2str(hto->time, buf, 26);
 		RedisModule_ReplyWithCString(ctx, buf);
 		RedisModule_Free(buf);
 		RedisModule_ReplySetArrayLength(ctx, 2);
