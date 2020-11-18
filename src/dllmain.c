@@ -1,8 +1,6 @@
 ﻿#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <string.h>
 #include <windows.h>
+#include <time.h>
 #include "win32_types_hiredis.h"
 #include "redismodule.h"
 
@@ -27,7 +25,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 
 struct RainArrayObject {
 	float data[MAX_DATA_LENGTH];
-	PORT_LONGLONG end, time;
+	long long end, time;
 	char full, span;
 };
 typedef struct RainArrayObject RainObject;
@@ -54,7 +52,7 @@ size_t RainTypeMemUsage(const void* value) {
 	return sizeof(*o);
 }
 
-void CopyData(RainObject* d, int index, double* data, PORT_LONGLONG l) {
+void CopyData(RainObject* d, int index, double* data, long long l) {
 	int i = 0;
 	if (data) {
 		while (i < l) {
@@ -72,8 +70,8 @@ void CopyData(RainObject* d, int index, double* data, PORT_LONGLONG l) {
 	}
 }
 
-void InsertFuture(RainObject* o, double* v, PORT_LONGLONG time, PORT_LONGLONG count) {
-	PORT_LONGLONG begin, end;
+void InsertFuture(RainObject* o, double* v, long long time, long long count) {
+	long long begin, end;
 	begin = o->end + 1;
 	end = o->end + time - o->time;
 	CopyData(o, begin, 0, time - o->time - 1);
@@ -87,8 +85,8 @@ void InsertFuture(RainObject* o, double* v, PORT_LONGLONG time, PORT_LONGLONG co
 	CheckIndex(o->end);
 }
 
-void InsertData(RainObject* o, double* v, PORT_LONGLONG time, PORT_LONGLONG count) {
-	PORT_LONGLONG btime = o->full ? o->time - MAX_DATA_LENGTH : o->time - o->end,
+void InsertData(RainObject* o, double* v, long long time, long long count) {
+	long long btime = o->full ? o->time - MAX_DATA_LENGTH : o->time - o->end,
 		di = o->full ? (o->end + 1) % MAX_DATA_LENGTH : 0;//data begin index;
 
 	if (!o->time)
@@ -115,8 +113,8 @@ void InsertData(RainObject* o, double* v, PORT_LONGLONG time, PORT_LONGLONG coun
 	}
 }
 
-void SearchData(RedisModuleCtx* ctx, RainObject* d, PORT_LONGLONG begin, PORT_LONGLONG end) {
-	PORT_LONGLONG b = 0, e = 0, btime, dbegin, count, dend;
+void SearchData(RedisModuleCtx* ctx, RainObject* d, long long begin, long long end) {
+	long long b = 0, e = 0, btime, dbegin, count, dend;
 
 	btime = d->full ? d->time - MAX_DATA_LENGTH : d->time - d->end;//begin time
 	dbegin = d->full ? (d->end + 1) % MAX_DATA_LENGTH : 0;//data begin index
@@ -124,7 +122,7 @@ void SearchData(RedisModuleCtx* ctx, RainObject* d, PORT_LONGLONG begin, PORT_LO
 	if (begin > d->time || end < btime || begin > end)
 	{
 		RedisModule_ReplyWithArray(ctx, REDISMODULE_POSTPONED_ARRAY_LEN);
-		while (begin++ <= end )
+		while (begin++ <= end)
 			RedisModule_ReplyWithDouble(ctx, -1);
 		count = end - begin + 1;
 		RedisModule_ReplySetArrayLength(ctx, count < 0 ? 0 : count);
@@ -144,7 +142,7 @@ void SearchData(RedisModuleCtx* ctx, RainObject* d, PORT_LONGLONG begin, PORT_LO
 
 	count = end - begin + 1;
 	RedisModule_ReplyWithArray(ctx, REDISMODULE_POSTPONED_ARRAY_LEN);
-	
+
 	while (begin++ < btime)
 		RedisModule_ReplyWithDouble(ctx, -1);
 
@@ -163,8 +161,8 @@ void SearchData(RedisModuleCtx* ctx, RainObject* d, PORT_LONGLONG begin, PORT_LO
 	RedisModule_ReplySetArrayLength(ctx, count);
 }
 
-double SearchSumData(RedisModuleCtx* ctx, RainObject* d, PORT_LONGLONG begin, PORT_LONGLONG end) {
-	PORT_LONGLONG b = 0, e = 0, btime, dbegin, count, dend;
+double SearchSumData(RedisModuleCtx* ctx, RainObject* d, long long begin, long long end) {
+	long long b = 0, e = 0, btime, dbegin, count, dend;
 	double sum = 0.0;
 
 	btime = d->full ? d->time - MAX_DATA_LENGTH : d->time - d->end;//begin time
@@ -194,7 +192,7 @@ double SearchSumData(RedisModuleCtx* ctx, RainObject* d, PORT_LONGLONG begin, PO
 	return sum;
 }
 
-PORT_LONGLONG RainDataLength(RainObject* o) {
+long long RainDataLength(RainObject* o) {
 	if (o->full) {
 		return MAX_DATA_LENGTH;
 	}
@@ -213,7 +211,7 @@ int RainTypeSearch_RedisCommand(RedisModuleCtx* ctx, RedisModuleString** argv, i
 		return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
 	}
 
-	PORT_LONGLONG begin, end;
+	long long begin, end;
 	if (RedisModule_StringToLongLong(argv[2], &begin) != REDISMODULE_OK ||
 		RedisModule_StringToLongLong(argv[3], &end) != REDISMODULE_OK ||
 		begin < 0 || end < 0) {
@@ -240,7 +238,7 @@ int RainTypeSum_RedisCommand(RedisModuleCtx* ctx, RedisModuleString** argv, int 
 		return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
 	}
 
-	PORT_LONGLONG begin, end;
+	long long begin, end;
 	double result;
 	if (RedisModule_StringToLongLong(argv[2], &begin) != REDISMODULE_OK ||
 		RedisModule_StringToLongLong(argv[3], &end) != REDISMODULE_OK ||
@@ -269,7 +267,7 @@ int RainTypeInsert_RedisCommand(RedisModuleCtx* ctx, RedisModuleString** argv, i
 		return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
 	}
 
-	PORT_LONGLONG time;
+	long long time;
 	if ((RedisModule_StringToLongLong(argv[2], &time) != REDISMODULE_OK)) {
 		return RedisModule_ReplyWithError(ctx, "ERR invalid value: must be a double");
 	}
@@ -294,7 +292,7 @@ int RainTypeInsert_RedisCommand(RedisModuleCtx* ctx, RedisModuleString** argv, i
 	else {
 		hto = RedisModule_ModuleTypeGetValue(key);
 	}
-	InsertData(hto, value, time, (PORT_LONGLONG)argc - 3);
+	InsertData(hto, value, time, (long long)argc - 3);
 
 	RedisModule_ReplyWithLongLong(ctx, RainDataLength(hto));
 	RedisModule_ReplicateVerbatim(ctx);
@@ -303,7 +301,7 @@ int RainTypeInsert_RedisCommand(RedisModuleCtx* ctx, RedisModuleString** argv, i
 
 void RainTypeRdbSave(RedisModuleIO* rdb, void* value) {
 	RainObject* hto = value;
-	PORT_LONGLONG i = 0;
+	long long i = 0;
 	RedisModule_SaveSigned(rdb, hto->time);
 	RedisModule_SaveSigned(rdb, hto->end);
 	RedisModule_SaveSigned(rdb, hto->full);
@@ -325,8 +323,8 @@ void* RainTypeRdbLoad(RedisModuleIO* rdb, int encver) {
 		/* RedisModule_Log("warning","Can't load data with version %d", encver);*/
 		return NULL;
 	}
-	uint64_t time = RedisModule_LoadUnsigned(rdb), 
-		end = RedisModule_LoadUnsigned(rdb), 
+	uint64_t time = RedisModule_LoadUnsigned(rdb),
+		end = RedisModule_LoadUnsigned(rdb),
 		full = RedisModule_LoadUnsigned(rdb),
 		i = 0;
 
@@ -379,7 +377,7 @@ char* F2S(double d, char* str)
 
 void RainTypeAofRewrite(RedisModuleIO* aof, RedisModuleString* key, void* value) {
 	RainObject* o = value;
-	PORT_LONGLONG i = o->end + 1, time = o->time - o->end;
+	long long i = o->end + 1, time = o->time - o->end;
 	char data[16];
 
 	if (o->full) {
@@ -416,33 +414,60 @@ int RainTypeNow_RedisCommand(RedisModuleCtx* ctx, RedisModuleString** argv, int 
 	return REDISMODULE_OK;
 }
 
-char* getfmt() {
-	char* m = (char*)malloc(sizeof(int) * 2 + sizeof(char*)); /* prepare enough memory*/
-	void* bm = m; /* copies the pointer */
-	char* string = "I am a string!!"; /* an example string */
+void time2str(long long n, char* buf, size_t len)
+{
+	time_t time = n;
+	struct tm p;
+	time_t min = 1600000000, max = 2000000000;
 
-	(*(int*)m) = 10; /*puts the first value */
-	m += sizeof(int); /* move forward the pointer to the next element */
-
-	(*(char**)m) = string; /* puts the next value */
-	m += sizeof(char*); /* move forward again*/
-
-	(*(int*)m) = 20; /* puts the third element */
-	m += sizeof(int); /* unneeded, but here for clarity. */
-
-	vprintf("%d %s %d\n", bm); /* the deep magic starts here...*/
-	free(bm);
+	n *= 5 * 60;
+	if (n > max)
+	{
+		buf[0] = '\0';
+		return;
+	}
+	else if (n < min)
+	{
+		n *= 12;
+		if (n > max || n < min)
+		{
+			buf[0] = '\0';
+			return;
+		}
+	}
+	gmtime_s(&p, &time);
+	strftime(buf, len, "%Y-%m-%d %H:%M:%S", &p);
 }
 
-//void RainTypeDigest(RedisModuleDigest* md, void* value) {
-//	RainObject* hto = value;
-//	PORT_LONGLONG i = hto->end;
-//	double* data = hto->data;
-//	while (i < MAX_DATA_LENGTH) {
-//		RedisModule_DigestAddLongLong(md, data[i++]);
-//	}
-//	RedisModule_DigestEndSequence(md);
-//}
+int RainTypeTime_RedisCommand(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
+	RedisModule_AutoMemory(ctx); /* Use automatic memory management. */
+
+	if (argc != 2) return RedisModule_WrongArity(ctx);
+	RedisModuleKey* key = RedisModule_OpenKey(ctx, argv[1], REDISMODULE_READ | REDISMODULE_WRITE);
+	int type = RedisModule_KeyType(key);
+	if (type != REDISMODULE_KEYTYPE_EMPTY && RedisModule_ModuleTypeGetType(key) != RainType) {
+		return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
+	}
+
+	RainObject* hto = RedisModule_ModuleTypeGetValue(key);
+	if (hto != NULL)
+	{
+		long long begin = hto->full ? hto->time - MAX_DATA_LENGTH : hto->time - hto->end;
+
+		char* buf = RedisModule_Alloc(26);
+		time2str(begin, buf, 26);
+		RedisModule_ReplyWithArray(ctx, REDISMODULE_POSTPONED_ARRAY_LEN);
+		RedisModule_ReplyWithCString(ctx, buf);
+		time2str(begin, buf, 26);
+		RedisModule_ReplyWithCString(ctx, buf);
+		RedisModule_Free(buf);
+		RedisModule_ReplySetArrayLength(ctx, 2);
+	}
+	else
+		RedisModule_ReplyWithNull(ctx);
+
+	return REDISMODULE_OK;
+}
 
 __declspec(dllexport) int RedisModule_OnLoad(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
 	REDISMODULE_NOT_USED(argv);
@@ -478,6 +503,10 @@ __declspec(dllexport) int RedisModule_OnLoad(RedisModuleCtx* ctx, RedisModuleStr
 
 	if (RedisModule_CreateCommand(ctx, "raintype.now",
 		RainTypeNow_RedisCommand, "readonly", 1, 1, 1) == REDISMODULE_ERR)
+		return REDISMODULE_ERR;
+
+	if (RedisModule_CreateCommand(ctx, "raintype.time",
+		RainTypeTime_RedisCommand, "readonly", 1, 1, 1) == REDISMODULE_ERR)
 		return REDISMODULE_ERR;
 
 	return REDISMODULE_OK;
