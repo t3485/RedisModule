@@ -41,14 +41,11 @@ int redis_search(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
 		double value;
 		hyd_search(o, begin, end, &r);
 		RedisModule_ReplyWithArray(ctx, REDISMODULE_POSTPONED_ARRAY_LEN);
-		b = r.index - r.pre;
-		while (b < r.index) {
-			if (b < 0)
-				value = o->data[b + MAX_DATA_LENGTH];
-			else value = o->data[b];
-			b++;
-			RedisModule_ReplyWithDouble(ctx, value);
-		}
+		b = 0;
+		while (b++ < r.pre) 
+			RedisModule_ReplyWithDouble(ctx, 0);
+		
+		b = r.index;
 		e = r.index + r.size;
 		while (b < e) {
 			if (b >= MAX_DATA_LENGTH)
@@ -57,15 +54,11 @@ int redis_search(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
 			b++;
 			RedisModule_ReplyWithDouble(ctx, value);
 		}
-		e = r.index + r.suf;
-		while (b < e) {
-			if (b >= MAX_DATA_LENGTH)
-				value = o->data[b - MAX_DATA_LENGTH];
-			else value = o->data[b];
-			b++;
-			RedisModule_ReplyWithDouble(ctx, r.pre + r.size + r.suf);
-		}
-		RedisModule_ReplySetArrayLength(ctx, 0);
+		b = 0;
+		while (b++ < r.suf) 
+			RedisModule_ReplyWithDouble(ctx, 0);
+		
+		RedisModule_ReplySetArrayLength(ctx, r.pre + r.size + r.suf);
 	}
 	else {
 		RedisModule_ReplyWithArray(ctx, REDISMODULE_POSTPONED_ARRAY_LEN);
@@ -279,7 +272,12 @@ void time2str(long long n, char* buf, size_t len)
 			return;
 		}
 	}
+
+#ifdef _WINDOWS
 	gmtime_s(&p, &time);
+#else
+	gmtime_r(&time, &p);
+#endif
 	strftime(buf, len, "%Y-%m-%d %H:%M:%S", &p);
 }
 

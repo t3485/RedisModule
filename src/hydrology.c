@@ -113,21 +113,8 @@ float hyd_sum(RainObject* o, long long begin, long long end) {
 
 	hyd_search(o, begin, end, &r);
 
-	b = r.index - r.pre;
-	while (b < r.index) {
-		if (b < 0)
-			sum += o->data[b + MAX_DATA_LENGTH];
-		else sum += o->data[b];
-		b++;
-	}
+	b = r.index;
 	e = r.index + r.size;
-	while (b < e) {
-		if (b >= MAX_DATA_LENGTH)
-			sum += o->data[b - MAX_DATA_LENGTH];
-		else sum += o->data[b];
-		b++;
-	}
-	e = r.index + r.suf;
 	while (b < e) {
 		if (b >= MAX_DATA_LENGTH)
 			sum += o->data[b - MAX_DATA_LENGTH];
@@ -144,15 +131,11 @@ long long hyd_len(RainObject* o) {
 }
 
 void hyd_each(RainObject* o, struct SearchResult* r, void (*fn)(float, void*), void* p) {
-	long long b, e;
+	long long b = 0, e;
 
-	b = r->index - r->pre;
-	while (b < r->index) {
-		if (b < 0)
-			fn(o->data[b + MAX_DATA_LENGTH], p);
-		else fn(o->data[b], p);
-		b++;
-	}
+	while (b++ < r->pre)
+		fn(0, p);
+	b = r->index;
 	e = r->index + r->size;
 	while (b < e) {
 		if (b >= MAX_DATA_LENGTH)
@@ -160,11 +143,7 @@ void hyd_each(RainObject* o, struct SearchResult* r, void (*fn)(float, void*), v
 		else fn(o->data[b], p);
 		b++;
 	}
-	e = r->index + r->suf;
-	while (b < e) {
-		if (b >= MAX_DATA_LENGTH)
-			fn(o->data[b - MAX_DATA_LENGTH], p);
-		else fn(o->data[b], p);
-		b++;
-	}
+	b = 0;
+	while (b++ < r->suf)
+		fn(0, p);
 }

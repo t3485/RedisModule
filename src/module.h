@@ -1,8 +1,11 @@
 #ifndef  MODULE_H
 #define MODULE_H 
 
+#ifdef _WINDOWS
 #include "win32_types_hiredis.h"
+#endif
 #include "hydrology.h"
+
 #include "redismodule.h"
 #include <time.h>
 
