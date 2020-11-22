@@ -264,22 +264,22 @@ void time2str(long long n, char* buf, size_t len)
 	struct tm p;
 	time_t min = 1600000000, max = 2000000000;
 
-	n *= 5 * 60;
-	if (n > max)
+	time *= 5 * 60;
+	if (time > max)
 	{
 		buf[0] = '\0';
 		return;
 	}
-	else if (n < min)
+	else if (time < min)
 	{
-		n *= 12;
-		if (n > max || n < min)
+		time *= 12;
+		if (time > max || time < min)
 		{
 			buf[0] = '\0';
 			return;
 		}
 	}
-	gmtime_s(&p, &n);
+	gmtime_s(&p, &time);
 	strftime(buf, len, "%Y-%m-%d %H:%M:%S", &p);
 }
 
