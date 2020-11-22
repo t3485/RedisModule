@@ -3,8 +3,15 @@
   <ItemGroup>
     <ClInclude Include="src\redismodule.h" />
     <ClInclude Include="src\win32_types_hiredis.h" />
+    <ClInclude Include="src\hydrology.h" />
+    <ClInclude Include="src\module.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.c" />
+    <ClCompile Include="src\hydrology.c" />
+    <ClCompile Include="src\module.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\makefile" />
   </ItemGroup>
 </Project>

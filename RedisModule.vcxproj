@@ -19,11 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\hydrology.h" />
+    <ClInclude Include="src\module.h" />
     <ClInclude Include="src\redismodule.h" />
     <ClInclude Include="src\win32_types_hiredis.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.c" />
+    <ClCompile Include="src\hydrology.c" />
+    <ClCompile Include="src\module.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\makefile" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
