@@ -1,7 +1,7 @@
 dllmain.so: dllmain.o hydrology.o module.o
 	gcc -shared -o dllmain.so dllmain.o hydrology.o module.o
-dllmain.o: dllmain_linux.c
-	gcc -fPIC -c dllmain_linux.c -o dllmain.o
+dllmain.o: dllmain.c
+	gcc -fPIC -c dllmain.c -o dllmain.o
 hydrology.o: hydrology.c
 	gcc -fPIC -c hydrology.c
 module.o: module.c

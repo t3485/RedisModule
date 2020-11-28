@@ -1,11 +1,12 @@
 ﻿#include <stdio.h>
-#include <windows.h>
 #include <time.h>
-#include "win32_types_hiredis.h"
-
 #include "redismodule.h"
 #include "hydrology.h"
 #include "module.h"
+
+#ifdef _WINDOWS
+#include <windows.h>
+#include "win32_types_hiredis.h"
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
@@ -19,8 +20,16 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 	}
 	return TRUE;
 }
+#else
+int main() {
+	return 0;
+}
+#endif
 
-__declspec(dllexport) int RedisModule_OnLoad(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
+#ifdef _WINDOWS
+__declspec(dllexport)
+#endif
+int RedisModule_OnLoad(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
 	REDISMODULE_NOT_USED(argv);
 	REDISMODULE_NOT_USED(argc);
 
@@ -49,10 +58,6 @@ __declspec(dllexport) int RedisModule_OnLoad(RedisModuleCtx* ctx, RedisModuleStr
 		return REDISMODULE_ERR;
 
 	if (RedisModule_CreateCommand(ctx, "raintype.sum",
-		redis_sum, "readonly", 1, 1, 1) == REDISMODULE_ERR)
-		return REDISMODULE_ERR;
-
-	if (RedisModule_CreateCommand(ctx, "raintype.now",
 		redis_sum, "readonly", 1, 1, 1) == REDISMODULE_ERR)
 		return REDISMODULE_ERR;
 

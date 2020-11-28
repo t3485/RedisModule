@@ -274,9 +274,9 @@ void time2str(long long n, char* buf, size_t len)
 	}
 
 #ifdef _WINDOWS
-	gmtime_s(&p, &time);
+	localtime_s(&p, &time);
 #else
-	gmtime_r(&time, &p);
+	localtime_r(&time, &p);
 #endif
 	strftime(buf, len, "%Y-%m-%d %H:%M:%S", &p);
 }
@@ -297,13 +297,15 @@ int redis_time_range(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
 		long long begin = hto->full ? hto->time - MAX_DATA_LENGTH : hto->time - hto->end;
 
 		char* buf = RedisModule_Alloc(26);
-		time2str(begin, buf, 26);
 		RedisModule_ReplyWithArray(ctx, REDISMODULE_POSTPONED_ARRAY_LEN);
+		RedisModule_ReplyWithLongLong(ctx, begin);
+		time2str(begin, buf, 26);
 		RedisModule_ReplyWithCString(ctx, buf);
+		RedisModule_ReplyWithLongLong(ctx, hto->time);
 		time2str(hto->time, buf, 26);
 		RedisModule_ReplyWithCString(ctx, buf);
 		RedisModule_Free(buf);
-		RedisModule_ReplySetArrayLength(ctx, 2);
+		RedisModule_ReplySetArrayLength(ctx, 4);
 	}
 	else
 		RedisModule_ReplyWithNull(ctx);
