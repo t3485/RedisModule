@@ -1,12 +1,16 @@
 ﻿#include <stdio.h>
 #include <time.h>
+
+#ifdef _WINDOWS
+#include <windows.h>
+#include "win32_types_hiredis.h"
+#endif
+
 #include "redismodule.h"
 #include "hydrology.h"
 #include "module.h"
 
 #ifdef _WINDOWS
-#include <windows.h>
-#include "win32_types_hiredis.h"
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
