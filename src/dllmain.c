@@ -49,19 +49,19 @@ int RedisModule_OnLoad(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) 
 	g_raintype = RedisModule_CreateDataType(ctx, "rain-type", 0, &tm);
 	if (g_raintype == NULL) return REDISMODULE_ERR;
 
-	if (RedisModule_CreateCommand(ctx, "raintype.insert",
+	if (RedisModule_CreateCommand(ctx, "hydinsert",
 		redis_insert, "write deny-oom", 1, 1, 1) == REDISMODULE_ERR)
 		return REDISMODULE_ERR;
 
-	if (RedisModule_CreateCommand(ctx, "raintype.search",
+	if (RedisModule_CreateCommand(ctx, "hydrange",
 		redis_search, "readonly", 1, 1, 1) == REDISMODULE_ERR)
 		return REDISMODULE_ERR;
 
-	if (RedisModule_CreateCommand(ctx, "raintype.sum",
+	if (RedisModule_CreateCommand(ctx, "hydsum",
 		redis_sum, "readonly", 1, 1, 1) == REDISMODULE_ERR)
 		return REDISMODULE_ERR;
 
-	if (RedisModule_CreateCommand(ctx, "raintype.time",
+	if (RedisModule_CreateCommand(ctx, "hydtime",
 		redis_time_range, "readonly", 1, 1, 1) == REDISMODULE_ERR)
 		return REDISMODULE_ERR;
 
