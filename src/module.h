@@ -15,7 +15,6 @@ int redis_insert(RedisModuleCtx* ctx, RedisModuleString** argv, int argc);
 void redis_save(RedisModuleIO* rdb, void* value);
 void* redis_load(RedisModuleIO* rdb, int encver);
 void redis_aof(RedisModuleIO* aof, RedisModuleString* key, void* value);
-int redis_now(RedisModuleCtx* ctx, RedisModuleString** argv, int argc);
 int redis_time_range(RedisModuleCtx* ctx, RedisModuleString** argv, int argc);
 RainObject* redis_create();
 void redis_free(RainObject* o);

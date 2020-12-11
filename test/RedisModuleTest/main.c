@@ -1,11 +1,34 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <time.h>
-#include "hydrology.h"
+#include "../../src/hydrology.h"
 
 
-void p(float v, void * a) {
+void p(float v, void* a) {
 	printf("%f ", v);
+}
+
+int redis_save(void* value) {
+	int index = 0;
+	RainObject* hto = value;
+
+	long long i = hto->full ? hto->end + 1 : 0,
+		e = hto->full ? MAX_DATA_LENGTH - 1 : hto->end;
+	CheckIndex(i);
+
+	while (i <= e) {
+		index++;
+		i++;
+	}
+
+	if (hto->full) {
+		i = 0;
+		while (i <= hto->end) {
+			index++;
+			i++;
+		}
+	}
+	return index;
 }
 
 int main() {
@@ -41,5 +64,12 @@ int main() {
 	for (size_t i = 0; i < 288; i++)
 		v[i] = i + 700;
 	hyd_insert(o, v, 700, 288);
+
+	o->end = MAX_DATA_LENGTH - 1;
+	o->full = 1;
+	printf("count : %d\n", redis_save(o));
+
 	free(o);
+
+
 }

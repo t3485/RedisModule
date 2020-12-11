@@ -12,11 +12,6 @@ void obj_free(RainObject* o) {
 	RedisModule_Free(o);
 }
 
-size_t usage(const void* value) {
-	const RainObject* o = value;
-	return sizeof(*o);
-}
-
 int redis_search(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
 	RedisModule_AutoMemory(ctx);
 
@@ -171,7 +166,7 @@ void* redis_load(RedisModuleIO* rdb, int encver) {
 
 	if (hto->full) {
 		i = size - MAX_DATA_LENGTH;
-		while (i-- >= 0)
+		while (--i >= 0)
 			RedisModule_LoadDouble(rdb);
 		size = MAX_DATA_LENGTH;
 	}
@@ -220,35 +215,16 @@ void redis_aof(RedisModuleIO* aof, RedisModuleString* key, void* value) {
 
 	while (i <= e) {
 		float2str(o->data[i++], data);
-		RedisModule_EmitAOF(aof, "raintype.insert", "slc", key, time++, data);
+		RedisModule_EmitAOF(aof, "hydinsert", "slc", key, time++, data);
 	}
 
 	if (o->full) {
 		i = 0;
 		while (i <= o->end) {
 			float2str(o->data[i++], data);
-			RedisModule_EmitAOF(aof, "raintype.insert", "slc", key, time++, data);
+			RedisModule_EmitAOF(aof, "hydinsert", "slc", key, time++, data);
 		}
 	}
-}
-
-int redis_now(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
-	RedisModule_AutoMemory(ctx); /* Use automatic memory management. */
-
-	if (argc != 2) return RedisModule_WrongArity(ctx);
-	RedisModuleKey* key = RedisModule_OpenKey(ctx, argv[1], REDISMODULE_READ | REDISMODULE_WRITE);
-	int type = RedisModule_KeyType(key);
-	if (type != REDISMODULE_KEYTYPE_EMPTY && RedisModule_ModuleTypeGetType(key) != g_raintype) {
-		return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
-	}
-
-	RainObject* hto = RedisModule_ModuleTypeGetValue(key);
-	if (hto != NULL)
-		RedisModule_ReplyWithLongLong(ctx, hto->time);
-	else
-		RedisModule_ReplyWithNull(ctx);
-
-	return REDISMODULE_OK;
 }
 
 void time2str(long long n, char* buf, size_t len)
