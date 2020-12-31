@@ -135,7 +135,7 @@ void redis_save(RedisModuleIO* rdb, void* value) {
 
 	long long i = hto->full ? hto->end + 1 : 0,
 		e = hto->full ? MAX_DATA_LENGTH - 1 : hto->end;
-	CheckIndex(i);
+	i = CheckIndex(i);
 
 	while (i <= e) {
 		RedisModule_SaveDouble(rdb, hto->data[i++]);
@@ -211,7 +211,7 @@ void redis_aof(RedisModuleIO* aof, RedisModuleString* key, void* value) {
 	long long i = o->full ? o->end + 1 : 0,
 		e = o->full ? MAX_DATA_LENGTH - 1 : o->end, 
 		time = o->time - o->end;
-	CheckIndex(i);
+	i = CheckIndex(i);
 
 	while (i <= e) {
 		float2str(o->data[i++], data);

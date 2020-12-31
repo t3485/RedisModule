@@ -10,15 +10,15 @@ void hyd_copy(RainObject* o, int index, double* data, long long l) {
 	int i = 0;
 	if (data) {
 		while (i < l) {
-			if (index == MAX_DATA_LENGTH)
-				index = 0;
+			if (index >= MAX_DATA_LENGTH)
+				index = CheckIndex(index);
 			o->data[index++] = data[i++];
 		}
 	}
 	else {
 		while (i++ < l) {
-			if (index == MAX_DATA_LENGTH)
-				index = 0;
+			if (index >= MAX_DATA_LENGTH)
+				index = CheckIndex(index);
 			o->data[index++] = 0;
 		}
 	}
@@ -36,22 +36,23 @@ void hyd_insert_future(RainObject* o, double* v, long long time, long long count
 
 	if (o->end >= MAX_DATA_LENGTH)
 		o->full = 1;
-	CheckIndex(o->end);
+	o->end = CheckIndex(o->end);
 }
 
 void hyd_insert(RainObject* o, double* v, long long time, long long count) {
-	long long btime = o->full ? o->time - MAX_DATA_LENGTH : o->time - o->end,
-		di = o->full ? (o->end + 1) % MAX_DATA_LENGTH : 0;//data begin index;
-
 	if (!o->time)
 		o->time = time - 1;
+
+	long long btime = o->full ? o->time - MAX_DATA_LENGTH + 1 : o->time - o->end,
+		di = o->full ? (o->end + 1) % MAX_DATA_LENGTH : 0;//data begin index;
+
 	/*            o                MAX_DATA_LENGTH      v
 	*             |                      |              |
 	*  +-----------------+               +           +------+
 	*  +-----------------+               +           +------+ */
 	if (time > o->time + MAX_DATA_LENGTH) {
 		hyd_copy(o, 0, v, count);
-		o->time = time + count;
+		o->time = time + count - 1;
 		o->end = count - 1;
 		o->full = 0;
 	}
@@ -67,7 +68,7 @@ void hyd_insert(RainObject* o, double* v, long long time, long long count) {
 	*  +-----------------------+
 	*  +-----------------------+ */
 	else if (time + count > o->time) {
-		hyd_copy(o, di + (time - btime), v, o->time - time);
+		hyd_copy(o, di + (time - btime), v, o->time - time + 1);
 		hyd_insert_future(o, v + (o->time - time), o->time + 1, count - (o->time - time));
 	}
 	else if (time >= btime) {
@@ -82,7 +83,7 @@ void hyd_search(RainObject* o, long long begin, long long end, struct SearchResu
 	long long bgtime, di;
 
 	bgtime = o->full ? o->time - MAX_DATA_LENGTH : o->time - o->end;//begin time
-	di = o->full ? (o->end + 1) % MAX_DATA_LENGTH : 0;//data begin index
+	di = o->full ? CheckIndex(o->end + 1) : 0;//data begin index
 
 	if (begin > o->time || end < bgtime || begin > end) {
 		r->pre = end - begin + 1;
@@ -97,7 +98,7 @@ void hyd_search(RainObject* o, long long begin, long long end, struct SearchResu
 	else {
 		r->pre = 0;
 		r->index = (di + begin - bgtime);
-		CheckIndex(r->index);
+		r->index = CheckIndex(r->index);
 	}
 
 	if (end > o->time)
