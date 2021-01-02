@@ -1,8 +1,8 @@
 #ifndef  HYDROLOGY_H
 #define HYDROLOGY_H 
 
-#define MAX_DAY_COUNT 12
-#define MAX_DATA_LENGTH 12
+#define MAX_DAY_COUNT 288
+#define MAX_DATA_LENGTH (MAX_DAY_COUNT * 92)
 #define CheckIndex(i) (i >= MAX_DATA_LENGTH ? i % MAX_DATA_LENGTH : i)
 
 struct RainArrayObject {

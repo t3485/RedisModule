@@ -5,11 +5,15 @@
     <ClInclude Include="src\win32_types_hiredis.h" />
     <ClInclude Include="src\hydrology.h" />
     <ClInclude Include="src\module.h" />
+    <ClInclude Include="src\db.h" />
+    <ClInclude Include="src\common.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.c" />
     <ClCompile Include="src\hydrology.c" />
     <ClCompile Include="src\module.c" />
+    <ClCompile Include="src\db.c" />
+    <ClCompile Include="src\common.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\makefile" />
