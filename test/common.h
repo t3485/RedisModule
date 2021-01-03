@@ -18,6 +18,6 @@ extern const int g_ver;
 
 enum {
 	g_max_count = 288,
-	g_data_length = 30 * 92
+	g_data_length = 288 * 92
 };
 #endif

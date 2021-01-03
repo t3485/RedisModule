@@ -86,8 +86,9 @@ void hyd_insert(RainObject* o, double* v, long long time, long long count) {
 	*  +-----------------------+
 	*  +-----------------------+ */
 	else if (time + count > o->time) {
-		hyd_copy(o, di + (time - btime), v, o->time - time + 1);
-		hyd_insert_future(o, v + (o->time - time), o->time + 1, count - (o->time - time));
+		long long repert = o->time - time + 1;
+		hyd_copy(o, di + (time - btime), v, repert);
+		hyd_insert_future(o, v + repert, o->time + 1, count - repert);
 	}
 	else if (time >= btime) {
 		hyd_copy(o, di + (time - btime), v, count);
