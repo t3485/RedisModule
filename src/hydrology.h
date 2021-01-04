@@ -3,10 +3,6 @@
 
 #include "common.h"
 
-#define MAX_DAY_COUNT 288
-#define MAX_DATA_LENGTH (MAX_DAY_COUNT * 92)
-#define CheckIndex(i) (i >= MAX_DATA_LENGTH ? i % MAX_DATA_LENGTH : i)
-
 struct RainArrayObject {
 	float data[MAX_DATA_LENGTH];
 	long long end;//最后一个数据的索引位置
@@ -30,5 +26,6 @@ void hyd_search(RainObject * o, long long begin, long long end, struct SearchRes
 float hyd_sum(RainObject * o, long long begin, long long end);
 long long hyd_len(RainObject * o);
 void hyd_each(RainObject* o, struct SearchResult* r, void (*fn)(float, void*), void* p);
+inline int checkIndex(RainObject* o, int i);
 
 #endif

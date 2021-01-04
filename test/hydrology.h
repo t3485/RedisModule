@@ -3,10 +3,6 @@
 
 #include "common.h"
 
-#define MAX_DAY_COUNT 288
-#define MAX_DATA_LENGTH (MAX_DAY_COUNT * 92)
-#define CheckIndex(i) (i >= MAX_DATA_LENGTH ? i % MAX_DATA_LENGTH : i)
-
 struct RainArrayObject {
 	float data[MAX_DATA_LENGTH];
 	long long end;//最后一个数据的索引位置
