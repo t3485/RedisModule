@@ -1,6 +1,6 @@
 #include "hydrology.h"
 
-inline int checkIndex(RainObject* o, int i) {
+int checkIndex(RainObject* o, int i) {
 	return i >= o->total ? i % o->total : i;
 }
 

@@ -43,8 +43,8 @@ int redis_search(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
 		b = r.index;
 		e = r.index + r.size;
 		while (b < e) {
-			if (b >= MAX_DATA_LENGTH)
-				value = o->data[b - MAX_DATA_LENGTH];
+			if (b >= g_data_length)
+				value = o->data[b - g_data_length];
 			else value = o->data[b];
 			b++;
 			RedisModule_ReplyWithDouble(ctx, value);
@@ -131,11 +131,11 @@ void redis_save(RedisModuleIO* rdb, void* value) {
 	RainObject* hto = value;
 	RedisModule_SaveSigned(rdb, hto->time);
 	RedisModule_SaveSigned(rdb, hto->end);
-	RedisModule_SaveSigned(rdb, hto->full ? MAX_DATA_LENGTH : hto->end + 1);
+	RedisModule_SaveSigned(rdb, hto->full ? g_data_length : hto->end + 1);
 
 	long long i = hto->full ? hto->end + 1 : 0,
-		e = hto->full ? MAX_DATA_LENGTH - 1 : hto->end;
-	i = CheckIndex(i);
+		e = hto->full ? g_data_length - 1 : hto->end;
+	i = checkIndex(hto, i);
 
 	while (i <= e) {
 		RedisModule_SaveDouble(rdb, hto->data[i++]);
@@ -162,13 +162,13 @@ void* redis_load(RedisModuleIO* rdb, int encver) {
 	RainObject* hto = redis_create();
 	hto->end = end;
 	hto->time = time;
-	hto->full = size >= MAX_DATA_LENGTH;
+	hto->full = size >= g_data_length;
 
 	if (hto->full) {
-		i = size - MAX_DATA_LENGTH;
+		i = size - g_data_length;
 		while (--i >= 0)
 			RedisModule_LoadDouble(rdb);
-		size = MAX_DATA_LENGTH;
+		size = g_data_length;
 	}
 
 	while (i < size)
@@ -209,9 +209,9 @@ void redis_aof(RedisModuleIO* aof, RedisModuleString* key, void* value) {
 	char data[40];
 
 	long long i = o->full ? o->end + 1 : 0,
-		e = o->full ? MAX_DATA_LENGTH - 1 : o->end, 
+		e = o->full ? g_data_length - 1 : o->end, 
 		time = o->time - o->end;
-	i = CheckIndex(i);
+	i = checkIndex(o, i);
 
 	while (i <= e) {
 		float2str(o->data[i++], data);
@@ -270,7 +270,7 @@ int redis_time_range(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
 	RainObject* hto = RedisModule_ModuleTypeGetValue(key);
 	if (hto != NULL)
 	{
-		long long begin = hto->full ? hto->time - MAX_DATA_LENGTH : hto->time - hto->end;
+		long long begin = hto->full ? hto->time - g_data_length : hto->time - hto->end;
 
 		char* buf = RedisModule_Alloc(26);
 		RedisModule_ReplyWithArray(ctx, REDISMODULE_POSTPONED_ARRAY_LEN);

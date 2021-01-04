@@ -4,7 +4,7 @@
 #include "common.h"
 
 struct RainArrayObject {
-	float data[MAX_DATA_LENGTH];
+	float data[g_data_length];
 	long long end;//最后一个数据的索引位置
 	long long time;//最后一个数据的时间
 	int count, length, total;
@@ -26,5 +26,6 @@ void hyd_search(RainObject * o, long long begin, long long end, struct SearchRes
 float hyd_sum(RainObject * o, long long begin, long long end);
 long long hyd_len(RainObject * o);
 void hyd_each(RainObject* o, struct SearchResult* r, void (*fn)(float, void*), void* p);
+int checkIndex(RainObject* o, int i);
 
 #endif
