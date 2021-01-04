@@ -92,7 +92,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>G:\Flood\RedisModule\src;$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -156,8 +156,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="common.c" />
-    <ClCompile Include="hydrology.c" />
+    <ClCompile Include="..\src\common.c" />
+    <ClCompile Include="..\src\db.c" />
+    <ClCompile Include="..\src\dllmain.c" />
+    <ClCompile Include="..\src\hydrology.c" />
+    <ClCompile Include="..\src\module.c" />
     <ClCompile Include="test.c" />
   </ItemGroup>
   <ItemGroup>
@@ -166,10 +169,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="common.h" />
-    <ClInclude Include="hydrology.h" />
-    <ClInclude Include="redismodule.h" />
-    <ClInclude Include="win32_types_hiredis.h" />
+    <ClInclude Include="..\src\common.h" />
+    <ClInclude Include="..\src\db.h" />
+    <ClInclude Include="..\src\hydrology.h" />
+    <ClInclude Include="..\src\module.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

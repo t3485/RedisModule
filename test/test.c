@@ -1,5 +1,5 @@
 
-#include "hydrology.h"
+#include <hydrology.h>
 
 void throw(){
 	*(int*)0 = 0;
@@ -32,7 +32,7 @@ void assertlongEqual(long long x, long long y) {
 void CheckInsert() {
 	double data[12] = { 0,1,2,3,4,5,6,7,8,9,10,11 };
 	RainObject* o = (RainObject*)malloc(sizeof(RainObject));
-	hyd_init_length(o, 1, 12);
+	hyd_init_length(o, 12);
 	assertIntEqual(o->total, 12);
 
 	hyd_insert(o, data, 100, 1);
@@ -52,7 +52,7 @@ void CheckInsert() {
 void CheckInsertBefore() {
 	double data[12] = { 0,1,2,3,4,5,6,7,8,9,10,11 };
 	RainObject* o = (RainObject*)malloc(sizeof(RainObject));
-	hyd_init_length(o, 1, 12);
+	hyd_init_length(o, 12);
 	hyd_insert(o, data, 100, 12);
 
 	hyd_insert(o, data, 94, 12);
@@ -69,7 +69,7 @@ void CheckInsertBefore() {
 void CheckInsertFarBefore() {
 	double data[12] = { 0,1,2,3,4,5,6,7,8,9,10,11 };
 	RainObject* o = (RainObject*)malloc(sizeof(RainObject));
-	hyd_init_length(o, 1, 12);
+	hyd_init_length(o, 12);
 	hyd_insert(o, data, 100, 12);
 
 	hyd_insert(o, data, 80, 12);
@@ -82,7 +82,7 @@ void CheckInsertFarBefore() {
 void CheckInsertFarFuture() {
 	double data[12] = { 0,1,2,3,4,5,6,7,8,9,10,11 };
 	RainObject* o = (RainObject*)malloc(sizeof(RainObject));
-	hyd_init_length(o, 1, 12);
+	hyd_init_length(o, 12);
 	hyd_insert(o, data, 100, 12);
 
 	hyd_insert(o, data + 1, 200, 1);
@@ -96,9 +96,13 @@ void CheckInsertFarFuture() {
 void CheckInsertFuture() {
 	double data[12] = { 0,1,2,3,4,5,6,7,8,9,10,11 };
 	RainObject* o = (RainObject*)malloc(sizeof(RainObject));
-	hyd_init_length(o, 1, 12);
+	hyd_init_length(o, 12);
 	hyd_insert(o, data, 100, 12);
-
+	/*
+	 * 0 1 2 3 4 5 6 7 8 9 10 11
+	 * 0 1 2 3 4 5 0 1 2 3 4 5
+	 * 6 7 8 9 10 11 0 1 2 3 4 5
+	*/
 	hyd_insert(o, data, 106, 12);
 	assertCharEqual(o->full, 1);
 	for (size_t i = 0; i < 6; i++)
@@ -109,12 +113,25 @@ void CheckInsertFuture() {
 	free(o);
 }
 
+void Check() {
+	double data[12] = { 0,1,2,3,4,5,6,7,8,9,10,11 };
+	RainObject* o = (RainObject*)malloc(sizeof(RainObject));
+	hyd_init_length(o, 12);
+	hyd_insert(o, data, 100, 1);
+
+	hyd_insert(o, data, 200, 12);
+
+	free(o);
+}
+
 int main() {
 	CheckInsertFarBefore();
 	CheckInsertFarFuture();
 	CheckInsertFuture();
 	CheckInsertBefore();
 	CheckInsert();
+
+	Check();
 
 	printf("%s\n", "pass");
 }

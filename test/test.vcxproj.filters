@@ -15,27 +15,36 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="common.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="hydrology.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="test.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\common.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\db.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dllmain.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\module.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hydrology.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="hydrology.h">
+    <ClInclude Include="..\src\common.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="common.h">
+    <ClInclude Include="..\src\db.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="redismodule.h">
+    <ClInclude Include="..\src\hydrology.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="win32_types_hiredis.h">
+    <ClInclude Include="..\src\module.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -7,7 +7,7 @@ struct RainArrayObject {
 	float data[g_data_length];
 	long long end;//最后一个数据的索引位置
 	long long time;//最后一个数据的时间
-	int count, length, total;
+	int total;
 	char full;
 };
 typedef struct RainArrayObject RainObject;
@@ -20,7 +20,7 @@ struct SearchResult {
 };
 
 void hyd_init(RainObject* o);
-void hyd_init_length(RainObject* o, int count, int length);
+void hyd_init_length(RainObject* o, int length);
 void hyd_insert(RainObject * o, double* v, long long time, long long count);
 void hyd_search(RainObject * o, long long begin, long long end, struct SearchResult* r);
 float hyd_sum(RainObject * o, long long begin, long long end);

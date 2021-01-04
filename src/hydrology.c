@@ -8,20 +8,14 @@ void hyd_init(RainObject* o) {
 	o->time = 0;
 	o->end = -1;
 	o->full = 0;
-
-	o->count = g_max_count;
-	o->length = g_data_length;
-	o->total = o->count * o->length;
+	o->total = g_data_length;
 }
 
-void hyd_init_length(RainObject* o, int count, int length) {
+void hyd_init_length(RainObject* o, int length) {
 	o->time = 0;
 	o->end = -1;
 	o->full = 0;
-
-	o->count = count;
-	o->length = length;
-	o->total = o->count * o->length;
+	o->total = length;
 }
 
 void hyd_copy(RainObject* o, int index, double* data, long long l) {
@@ -86,8 +80,9 @@ void hyd_insert(RainObject* o, double* v, long long time, long long count) {
 	*  +-----------------------+
 	*  +-----------------------+ */
 	else if (time + count > o->time) {
+		long long zero = o->time - time + 1;
 		hyd_copy(o, di + (time - btime), v, o->time - time + 1);
-		hyd_insert_future(o, v + (o->time - time), o->time + 1, count - (o->time - time));
+		hyd_insert_future(o, v + zero, o->time + 1, count - zero);
 	}
 	else if (time >= btime) {
 		hyd_copy(o, di + (time - btime), v, count);
