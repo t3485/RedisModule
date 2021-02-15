@@ -50,7 +50,7 @@ int RedisModule_OnLoad(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) 
 		.digest = NULL
 	};
 
-	g_raintype = RedisModule_CreateDataType(ctx, "rain-type", 0, &tm);
+	g_raintype = RedisModule_CreateDataType(ctx, "rain-type", g_ver, &tm);
 	if (g_raintype == NULL) return REDISMODULE_ERR;
 
 	if (RedisModule_CreateCommand(ctx, "hydinsert",

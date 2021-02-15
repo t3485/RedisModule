@@ -138,22 +138,18 @@ void redis_save(RedisModuleIO* rdb, void* value) {
 	i = checkIndex(hto, i);
 
 	while (i <= e) {
-		RedisModule_SaveDouble(rdb, hto->data[i++]);
+		RedisModule_SaveFloat(rdb, hto->data[i++]);
 	}
 
 	if (hto->full) {
 		i = 0;
 		while (i <= hto->end) {
-			RedisModule_SaveDouble(rdb, hto->data[i++]);
+			RedisModule_SaveFloat(rdb, hto->data[i++]);
 		}
 	}
 }
 
-void* redis_load(RedisModuleIO* rdb, int encver) {
-	if (encver != 0) {//版本号
-		/* RedisModule_Log("warning","Can't load data with version %d", encver);*/
-		return NULL;
-	}
+void* redis_load_ver_0(RedisModuleIO* rdb) {
 	long long time = RedisModule_LoadUnsigned(rdb),
 		end = RedisModule_LoadUnsigned(rdb),
 		size = RedisModule_LoadUnsigned(rdb),
@@ -176,9 +172,43 @@ void* redis_load(RedisModuleIO* rdb, int encver) {
 	return hto;
 }
 
+void* redis_load_ver_1(RedisModuleIO* rdb) {
+	long long time = RedisModule_LoadUnsigned(rdb),
+		end = RedisModule_LoadUnsigned(rdb),
+		size = RedisModule_LoadUnsigned(rdb),
+		i = 0;
+
+	RainObject* hto = redis_create();
+	hto->end = end;
+	hto->time = time;
+	hto->full = size >= g_data_length;
+
+	if (hto->full) {
+		i = size - g_data_length;
+		while (--i >= 0)
+			RedisModule_LoadFloat(rdb);
+		size = g_data_length;
+	}
+
+	while (i < size)
+		hto->data[i++] = (float)RedisModule_LoadFloat(rdb);
+	return hto;
+}
+
+void* redis_load(RedisModuleIO* rdb, int encver) {
+	if (encver == 0) 
+	{
+		redis_load_ver_0(rdb);
+	}
+	else 
+	{
+		redis_load_ver_1(rdb);
+	}
+}
+
 char* float2str(double d, char* str)
 {
-	char str1[40];
+	char str1[128];
 	int j = 0, k, i;
 	i = (int)d;//浮点数的整数部分
 	while (i > 0)
