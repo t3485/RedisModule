@@ -44,7 +44,7 @@ int RedisModule_OnLoad(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) 
 		.version = REDISMODULE_TYPE_METHOD_VERSION,
 		.rdb_load = redis_load,
 		.rdb_save = redis_save,
-		.aof_rewrite = redis_aof,
+	//	.aof_rewrite = redis_aof,
 		.mem_usage = redis_usage,
 		.free = redis_free,
 		.digest = NULL

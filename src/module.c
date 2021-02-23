@@ -165,6 +165,7 @@ void* redis_load_ver_0(RedisModuleIO* rdb) {
 		while (--i >= 0)
 			RedisModule_LoadDouble(rdb);
 		size = g_data_length;
+		i = 0;
 	}
 
 	while (i < size)

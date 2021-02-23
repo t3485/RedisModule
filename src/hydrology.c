@@ -31,7 +31,7 @@ void hyd_copy(RainObject* o, int index, double* data, long long l) {
 		while (i++ < l) {
 			if (index >= o->total)
 				index = checkIndex(o, index);
-			o->data[index++] = 0;
+			o->data[index++] = g_null;
 		}
 	}
 }

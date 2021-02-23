@@ -10,6 +10,7 @@
 #include "redismodule.h"
 
 extern const float g_split;
+extern const float g_null;
 
 /*
 * Ä£¿é°æ±¾ºÅ
