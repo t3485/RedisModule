@@ -27,5 +27,6 @@ float hyd_sum(RainObject * o, long long begin, long long end);
 long long hyd_len(RainObject * o);
 void hyd_each(RainObject* o, struct SearchResult* r, void (*fn)(float, void*), void* p);
 int checkIndex(RainObject* o, int i);
+float hyd_max(RainObject* o, long long begin, long long end, struct SearchResult* sr);
 
 #endif

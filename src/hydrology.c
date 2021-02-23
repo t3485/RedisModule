@@ -122,7 +122,7 @@ void hyd_search(RainObject* o, long long begin, long long end, struct SearchResu
 
 float hyd_sum(RainObject* o, long long begin, long long end) {
 	struct SearchResult r;
-	float sum = 0;
+	float sum = 0, v;
 	long long b, e;
 
 	hyd_search(o, begin, end, &r);
@@ -131,11 +131,40 @@ float hyd_sum(RainObject* o, long long begin, long long end) {
 	e = r.index + r.size;
 	while (b < e) {
 		if (b >= o->total)
-			sum += o->data[b - o->total];
-		else sum += o->data[b];
+			v = o->data[b - o->total];
+		else v = o->data[b];
+		if (v > g_null)
+			sum += v;
 		b++;
 	}
 	return sum;
+}
+
+float hyd_max(RainObject* o, long long begin, long long end, struct SearchResult* sr) {
+	struct SearchResult r;
+	float max = 0, v;
+	long long b, e, index = -1;
+
+	hyd_search(o, begin, end, &r);
+
+	b = r.index;
+	e = r.index + r.size;
+	while (b < e) {
+		if (b >= o->total)
+			v = o->data[b - o->total];
+		else v = o->data[b];
+		if (v > max) {
+			max = v;
+			index = b;
+		}
+		b++;
+	}
+
+	if (sr) {
+		sr->index = index;
+	}
+
+	return max;
 }
 
 long long hyd_len(RainObject* o) {

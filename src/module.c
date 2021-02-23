@@ -37,9 +37,9 @@ int redis_search(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
 		hyd_search(o, begin, end, &r);
 		RedisModule_ReplyWithArray(ctx, REDISMODULE_POSTPONED_ARRAY_LEN);
 		b = 0;
-		while (b++ < r.pre) 
+		while (b++ < r.pre)
 			RedisModule_ReplyWithDouble(ctx, 0);
-		
+
 		b = r.index;
 		e = r.index + r.size;
 		while (b < e) {
@@ -50,9 +50,9 @@ int redis_search(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
 			RedisModule_ReplyWithDouble(ctx, value);
 		}
 		b = 0;
-		while (b++ < r.suf) 
+		while (b++ < r.suf)
 			RedisModule_ReplyWithDouble(ctx, 0);
-		
+
 		RedisModule_ReplySetArrayLength(ctx, r.pre + r.size + r.suf);
 	}
 	else {
@@ -83,6 +83,39 @@ int redis_sum(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
 	if (o)
 		RedisModule_ReplyWithDouble(ctx, hyd_sum(o, begin, end));
 	else RedisModule_ReplyWithDouble(ctx, 0);
+
+	return REDISMODULE_OK;
+}
+
+int redis_max(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
+	RedisModule_AutoMemory(ctx); /* Use automatic memory management. */
+
+	if (argc != 4) return RedisModule_WrongArity(ctx);
+	RedisModuleKey* key = RedisModule_OpenKey(ctx, argv[1], REDISMODULE_READ | REDISMODULE_WRITE);
+	int type = RedisModule_KeyType(key);
+	if (type != REDISMODULE_KEYTYPE_EMPTY && RedisModule_ModuleTypeGetType(key) != g_raintype) {
+		return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
+	}
+
+	long long begin, end;
+	if (RedisModule_StringToLongLong(argv[2], &begin) != REDISMODULE_OK ||
+		RedisModule_StringToLongLong(argv[3], &end) != REDISMODULE_OK ||
+		begin < 0 || end < 0) {
+		return RedisModule_ReplyWithError(ctx, "ERR invalid value: must be a number");
+	}
+
+	if (begin > end) {
+		return RedisModule_ReplyWithError(ctx, "end must greater than or equal begin");
+	}
+
+	RainObject* o = RedisModule_ModuleTypeGetValue(key);
+
+	struct SearchResult r;
+	float max = hyd_max(o, begin, end, &r);
+	RedisModule_ReplyWithArray(ctx, REDISMODULE_POSTPONED_ARRAY_LEN);
+	RedisModule_ReplyWithDouble(ctx, max);
+	RedisModule_ReplyWithDouble(ctx, r.index);
+	RedisModule_ReplySetArrayLength(ctx, 2);
 
 	return REDISMODULE_OK;
 }
@@ -197,11 +230,11 @@ void* redis_load_ver_1(RedisModuleIO* rdb) {
 }
 
 void* redis_load(RedisModuleIO* rdb, int encver) {
-	if (encver == 0) 
+	if (encver == 0)
 	{
 		redis_load_ver_0(rdb);
 	}
-	else 
+	else
 	{
 		redis_load_ver_1(rdb);
 	}
@@ -240,7 +273,7 @@ void redis_aof(RedisModuleIO* aof, RedisModuleString* key, void* value) {
 	char data[40];
 
 	long long i = o->full ? o->end + 1 : 0,
-		e = o->full ? g_data_length - 1 : o->end, 
+		e = o->full ? g_data_length - 1 : o->end,
 		time = o->time - o->end;
 	i = checkIndex(o, i);
 

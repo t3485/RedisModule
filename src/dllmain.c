@@ -69,5 +69,9 @@ int RedisModule_OnLoad(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) 
 		redis_time_range, "readonly", 1, 1, 1) == REDISMODULE_ERR)
 		return REDISMODULE_ERR;
 
+	if (RedisModule_CreateCommand(ctx, "hydmax",
+		redis_max, "readonly", 1, 1, 1) == REDISMODULE_ERR)
+		return REDISMODULE_ERR;
+
 	return REDISMODULE_OK;
 }
