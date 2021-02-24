@@ -161,7 +161,7 @@ float hyd_max(RainObject* o, long long begin, long long end, struct SearchResult
 	}
 
 	if (sr) {
-		sr->index = index;
+		sr->index = index == -1 ? -1 : index - o->end + o->time;
 	}
 
 	return max;
