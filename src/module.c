@@ -222,6 +222,7 @@ void* redis_load_ver_1(RedisModuleIO* rdb) {
 		while (--i >= 0)
 			RedisModule_LoadFloat(rdb);
 		size = g_data_length;
+		i = 0;
 	}
 
 	while (i < size)
