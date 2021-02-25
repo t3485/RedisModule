@@ -108,14 +108,18 @@ int redis_max(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
 		return RedisModule_ReplyWithError(ctx, "end must greater than or equal begin");
 	}
 
-	RainObject* o = RedisModule_ModuleTypeGetValue(key);
-
-	struct SearchResult r;
-	float max = hyd_max(o, begin, end, &r);
 	RedisModule_ReplyWithArray(ctx, REDISMODULE_POSTPONED_ARRAY_LEN);
-	RedisModule_ReplyWithDouble(ctx, max);
-	RedisModule_ReplyWithDouble(ctx, r.index);
-	RedisModule_ReplySetArrayLength(ctx, 2);
+	RainObject* o = RedisModule_ModuleTypeGetValue(key);
+	if (o) {
+		struct SearchResult r;
+		float max = hyd_max(o, begin, end, &r);
+		RedisModule_ReplyWithDouble(ctx, max);
+		RedisModule_ReplyWithDouble(ctx, r.index);
+		RedisModule_ReplySetArrayLength(ctx, 2);
+	}
+	else {
+		RedisModule_ReplySetArrayLength(ctx, 0);
+	}
 
 	return REDISMODULE_OK;
 }
