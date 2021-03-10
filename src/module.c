@@ -38,7 +38,7 @@ int redis_search(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
 		RedisModule_ReplyWithArray(ctx, REDISMODULE_POSTPONED_ARRAY_LEN);
 		b = 0;
 		while (b++ < r.pre)
-			RedisModule_ReplyWithDouble(ctx, 0);
+			RedisModule_ReplyWithDouble(ctx, g_null);
 
 		b = r.index;
 		e = r.index + r.size;
@@ -51,7 +51,7 @@ int redis_search(RedisModuleCtx* ctx, RedisModuleString** argv, int argc) {
 		}
 		b = 0;
 		while (b++ < r.suf)
-			RedisModule_ReplyWithDouble(ctx, 0);
+			RedisModule_ReplyWithDouble(ctx, g_null);
 
 		RedisModule_ReplySetArrayLength(ctx, r.pre + r.size + r.suf);
 	}
