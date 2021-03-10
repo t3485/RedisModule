@@ -1,5 +1,8 @@
 #include "hydrology.h"
 
+#define HYD_BEGIN_TIME(o) (o->full ? o->time - o->total + 1 : o->time - o->end)
+#define HYD_BEGIN_INDEX(o) (o->full ? (o->end + 1) % o->total : 0)
+
 int checkIndex(RainObject* o, int i) {
 	return i >= o->total ? i % o->total : i;
 }
@@ -55,10 +58,9 @@ void hyd_insert(RainObject* o, double* v, long long time, long long count) {
 	if (!o->time)
 		o->time = time - 1;
 
-	long long btime = o->full ? o->time - o->total + 1 : o->time - o->end,
-		di = o->full ? (o->end + 1) % o->total : 0;//data begin index;
+	long long btime = HYD_BEGIN_TIME(o), di = HYD_BEGIN_INDEX(o);
 
-	/*            o                o->total      v
+	/*            o                o->total             v
 	*             |                      |              |
 	*  +-----------------+               +           +------+
 	*  +-----------------+               +           +------+ */
@@ -79,7 +81,7 @@ void hyd_insert(RainObject* o, double* v, long long time, long long count) {
 	*             |         |
 	*  +-----------------------+
 	*  +-----------------------+ */
-	else if (time + count > o->time) {
+	else if (time + count - 1 > o->time) {
 		long long zero = o->time - time + 1;
 		hyd_copy(o, di + (time - btime), v, o->time - time + 1);
 		hyd_insert_future(o, v + zero, o->time + 1, count - zero);
@@ -93,10 +95,7 @@ void hyd_insert(RainObject* o, double* v, long long time, long long count) {
 }
 
 void hyd_search(RainObject* o, long long begin, long long end, struct SearchResult* r) {
-	long long bgtime, di;
-
-	bgtime = o->full ? o->time - o->total : o->time - o->end;//begin time
-	di = o->full ? checkIndex(o, o->end + 1) : 0;//data begin index
+	long long bgtime = HYD_BEGIN_TIME(o), di = HYD_BEGIN_INDEX(o);
 
 	if (begin > o->time || end < bgtime || begin > end) {
 		r->pre = end - begin + 1;
